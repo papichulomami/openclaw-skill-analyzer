@@ -81,6 +81,47 @@ Each finding has a severity level with a point value:
 
 One CRITICAL finding = overall CRITICAL. Three or more HIGH findings = overall HIGH. The tool is intentionally strict — better to flag something harmless than miss something dangerous.
 
+## Docker sandbox mode (recommended)
+
+If you're scanning skills you don't trust — which should be most of them — run the analyzer inside a Docker container. This way, even if a skill contains something nasty, it's trapped in a throwaway box with no access to your system.
+
+**Requirements:** Docker installed on your machine.
+
+**One-time setup:** Pull the Python image:
+
+```bash
+docker pull python:3.12-slim
+```
+
+**Run a scan:**
+
+```bash
+docker run --rm \
+    --network none \
+    --read-only \
+    --tmpfs /tmp:size=10m \
+    --memory 256m \
+    --cpus 0.5 \
+    -v "/path/to/openclaw-skill-analyzer/scripts/analyze_skill.py:/analyzer/analyze_skill.py:ro" \
+    -v "/path/to/skill-to-scan:/skill:ro" \
+    python:3.12-slim \
+    python /analyzer/analyze_skill.py --skill_path /skill
+```
+
+**What the flags do:**
+
+- `--network none` — no internet access, nothing can phone home or exfiltrate data
+- `--read-only` — container can't write to your filesystem
+- `--tmpfs /tmp:size=10m` — small temporary space, wiped when container dies
+- `--memory 256m` — can't eat your server's RAM
+- `--cpus 0.5` — can't hog your CPU
+- `-v ... :ro` — your files are mounted read-only, the container can look but not touch
+- `--rm` — container is destroyed after the scan, no traces left
+
+**Why bother?** Because the analyzer reads files from the skill you're scanning. If a skill has weird filenames, symlinks pointing outside the directory, or binary files designed to exploit parsers, running inside Docker means the worst case scenario is you kill the container. Your SSH keys, your .env files, your OpenClaw config — all untouched.
+
+**Self-scan note:** If you scan this tool against itself, it will flag CRITICAL. That's because it detects its own regex patterns (references to `exec`, `eval`, `.env`, `id_rsa`, etc.). That's expected and actually a good sign — the rules are working. Don't let that scare you.
+
 ## Limitations
 
 This is static analysis. It reads code and matches patterns. It doesn't run anything, doesn't sandbox anything, and can't catch everything. A sufficiently clever attacker could evade regex-based detection. This tool is meant to catch the obvious and the common, not to replace a full manual code review on skills you plan to use in production.
