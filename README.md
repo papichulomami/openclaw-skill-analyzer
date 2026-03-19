@@ -23,6 +23,53 @@ I got tired of manually reading through skill source code every time I wanted to
 - **Network access** — raw sockets, hardcoded IPs and URLs
 - **Information disclosure** — system enumeration, debug output leaking secrets
 
+## Demo
+
+```
+============================================================
+  OpenClaw Skill Analyzer - Advanced Security Audit
+============================================================
+  Target: /path/to/skill
+  Time:   2026-03-19 16:45:39
+============================================================
+
+────────────────────────────────────────────────────────────
+  SCAN RESULTS
+────────────────────────────────────────────────────────────
+  Files analyzed:  9
+  Lines analyzed:  3924
+  File types:      {'.md': 3, '.py': 1, '.txt': 2}
+────────────────────────────────────────────────────────────
+
+  🔴  Overall Risk: CRITICAL
+  Risk Score: 237 (71%)
+
+  Findings:
+    🔴 Critical:  12
+    🟠 High:      11
+    🟡 Medium:    10
+    🟢 Low:       0
+    ℹ️  Info:      0
+    ─────────────────────
+    Total:        33
+
+────────────────────────────────────────────────────────────
+  CATEGORY BREAKDOWN
+────────────────────────────────────────────────────────────
+    Privilege Escalation:     3 finding(s)
+    Hidden File Access:       4 finding(s)
+    Dangerous Code Execution: 2 finding(s)
+    Code Obfuscation:         2 finding(s)
+    Credential Theft:         4 finding(s)
+    Sandbox Escape:           3 finding(s)
+    Prompt Injection:         3 finding(s)
+    Supply Chain Risk:        2 finding(s)
+    Data Exfiltration:        1 finding(s)
+    Information Disclosure:   6 finding(s)
+```
+
+*Self-scan output — the analyzer flags its own regex patterns, which is expected.*
+
 ## Setup
 
 No dependencies. Just Python 3. Clone the repo and run it.

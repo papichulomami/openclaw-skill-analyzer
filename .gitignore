@@ -1,0 +1,6 @@
+# Old documentation files (replaced by README.md)
+*.pdf
+*.zip
+openclawskillanalyzer.txt
+open skill analyzer.md
+.DS_Store
